@@ -6,6 +6,7 @@
     "compatibility_date": "2025-07-15",
     "compatibility_flags": ["nodejs_compat"],
     "observability": { "enabled": true },
+    "routes": [{ "pattern": "ternal-nguyenquoctri.io.vn", "custom_domain": true }],
     // Public values (RLS protects the data), read by Nuxt runtimeConfig.public at runtime.
     "vars": {
         "NUXT_PUBLIC_SUPABASE_URL": "https://mdvqbvnyakxhmmfeeqij.supabase.co",
