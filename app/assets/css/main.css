@@ -1,0 +1,46 @@
+/* Design tokens and shared pixel primitives. Component-specific styles live in each .vue file. */
+:root {
+  --bg: #0c1412; --panel: #15211d; --panel-2: #1c2b26; --line: #34493f; --ink: #070c0a;
+  --text: #ebe7d6; --muted: #a3b5a8; --head: #f4efd9;
+  --teal: #5ff2c8; --gold: #e2b54a; --gold-d: #a87a24; --moss: #4c7a3a; --leaf: #7fbf4d; --parchment: #e9e2c8;
+  --px: 4px;
+  --display: 'Bungee', system-ui, sans-serif;
+  --body: 'Be Vietnam Pro', system-ui, sans-serif;
+  --pixel: 'Silkscreen', ui-monospace, monospace; /* no Vietnamese glyphs: ASCII labels only */
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 17px/1.65 var(--body); }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Pixel border with notched corners */
+.pbox { position: relative; background: var(--panel); box-shadow: 0 calc(-1*var(--px)) 0 0 var(--line), 0 var(--px) 0 0 var(--line), calc(-1*var(--px)) 0 0 0 var(--line), var(--px) 0 0 0 var(--line), inset 0 0 0 var(--px) var(--ink); padding: 22px; }
+/* Moss growing on the top edge */
+.mossy::before { content: ''; position: absolute; top: -10px; left: 10px; right: 10px; height: 8px; background: repeating-linear-gradient(90deg, var(--moss) 0 8px, transparent 8px 12px, var(--leaf) 12px 16px, transparent 16px 28px, var(--moss) 28px 40px, transparent 40px 46px); clip-path: polygon(0 40%, 100% 40%, 100% 100%, 0 100%); }
+
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 20px; font: 700 15px/1 var(--body); text-decoration: none; color: var(--ink); background: var(--gold); border: 0; cursor: pointer; box-shadow: 0 calc(-1*var(--px)) 0 0 var(--ink), 0 var(--px) 0 0 var(--ink), calc(-1*var(--px)) 0 0 0 var(--ink), var(--px) 0 0 0 var(--ink), inset 0 calc(-1*var(--px)) 0 0 var(--gold-d); transition: transform .08s steps(2); }
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(2px); }
+.btn.ghost { background: rgba(7, 12, 10, .6); color: var(--teal); box-shadow: 0 calc(-1*var(--px)) 0 0 var(--teal), 0 var(--px) 0 0 var(--teal), calc(-1*var(--px)) 0 0 0 var(--teal), var(--px) 0 0 0 var(--teal); }
+.actions { display: flex; flex-wrap: wrap; gap: 18px; }
+
+/* Sections */
+section.block { padding: 72px clamp(16px, 6vw, 80px); max-width: 1180px; margin: 0 auto; }
+.eyebrow { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; font: 700 13px/1 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--teal); }
+.stage { font: 400 13px/1 var(--pixel); letter-spacing: 0; color: var(--ink); background: var(--gold); padding: 4px 6px; }
+h2 { margin: 0 0 40px; font: 400 clamp(26px, 3.6vw, 38px)/1.2 var(--display); color: var(--head); text-shadow: 3px 3px 0 var(--ink); }
+
+/* Only hide for the scroll reveal when JS is running (the reveal plugin adds .js) */
+.js .reveal { opacity: 0; transform: translateY(16px); transition: opacity .5s steps(5), transform .5s steps(5); }
+.js .reveal.in { opacity: 1; transform: none; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chips span { font: 600 13px/1 var(--body); padding: 6px 8px; background: var(--panel-2); color: var(--teal); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .js .reveal { opacity: 1; transform: none; }
+}
