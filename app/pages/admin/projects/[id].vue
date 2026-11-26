@@ -57,6 +57,32 @@ function move<T>(list: T[], i: number, d: number) {
     ;[list[i], list[j]] = [list[j]!, list[i]!]
 }
 
+// Cover upload: compress to WebP, store in the public "project-covers" bucket, put its URL in cover_url.
+// shortcut: replaced covers stay in the bucket; clean them up in the Supabase dashboard if storage gets tight.
+const uploading = ref(false)
+const uploadError = ref('')
+async function uploadCover(e: Event) {
+    const input = e.target as HTMLInputElement
+    const file = input.files?.[0]
+    input.value = '' // allow picking the same file again
+    if (!file) return
+    if (!file.type.startsWith('image/')) { uploadError.value = 'Chỉ nhận file ảnh.'; return }
+    uploading.value = true
+    uploadError.value = ''
+    try {
+        const blob = await toWebp(file)
+        const path = `${form.slug || slugify(form.title) || 'project'}-${Date.now()}.webp`
+        const bucket = db.storage.from('project-covers')
+        const { error } = await bucket.upload(path, blob, { contentType: 'image/webp', cacheControl: '31536000' })
+        if (error) throw error
+        form.cover_url = bucket.getPublicUrl(path).data.publicUrl
+    } catch (err: any) {
+        uploadError.value = `Tải ảnh thất bại: ${err.message ?? err}`
+    } finally {
+        uploading.value = false
+    }
+}
+
 const saving = ref(false)
 const status = ref<{ ok: boolean; text: string } | null>(null)
 
@@ -120,7 +146,17 @@ async function save() {
                 <h2>Liên kết &amp; media</h2>
                 <label class="field"><span>GitHub</span><input v-model.trim="form.github_url" type="url" placeholder="https://github.com/..."></label>
                 <div class="media">
-                    <label class="field"><span>Ảnh bìa (URL)</span><input v-model.trim="form.cover_url" type="url" placeholder="https://res.cloudinary.com/..."></label>
+                    <div class="stack">
+                        <label class="field"><span>Ảnh bìa (URL)</span><input v-model.trim="form.cover_url" type="url" placeholder="Dán link ảnh hoặc tải ảnh lên"></label>
+                        <div class="upload">
+                            <label class="mini" :class="{ busy: uploading }">
+                                {{ uploading ? 'Đang tải lên…' : 'Tải ảnh lên' }}
+                                <input type="file" accept="image/*" :disabled="uploading" class="sr-only" @change="uploadCover">
+                            </label>
+                            <small>Tự thu nhỏ còn rộng 1600px và chuyển sang WebP, tối đa 2 MB.</small>
+                        </div>
+                        <small v-if="uploadError" class="msg err" role="alert">{{ uploadError }}</small>
+                    </div>
                     <img v-if="form.cover_url" :src="form.cover_url" alt="Xem trước ảnh bìa">
                 </div>
                 <label class="field">
@@ -199,6 +235,11 @@ a.mini { text-decoration: none; }
 .media { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 16px; align-items: end; }
 .media img { width: 200px; aspect-ratio: 16 / 9; object-fit: cover; object-position: top; background: var(--ink); }
 small.msg { display: block; margin-top: 6px; }
+.upload { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.upload small { color: var(--muted); font-size: 12.5px; }
+.upload label.mini:focus-within { box-shadow: inset 0 0 0 2px var(--teal); }
+.upload label.busy { cursor: wait; opacity: .7; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .savebar { position: sticky; bottom: 0; display: flex; align-items: center; gap: 16px; padding: 14px 0; background: var(--bg); border-top: 2px dashed var(--line); }
 .savebar .msg { margin: 0; }
 @media (max-width: 700px) {
