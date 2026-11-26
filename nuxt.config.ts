@@ -3,6 +3,8 @@ export default defineNuxtConfig({
     compatibilityDate: '2025-07-15',
     devtools: { enabled: true },
     css: ['~/assets/css/main.css'],
+    // Deployed as a Cloudflare Worker (see wrangler.jsonc). Supabase URL/key come from the Worker's vars at runtime.
+    nitro: { preset: 'cloudflare_module' },
     // Admin runs only in the browser: the login session lives in localStorage, and search engines should skip it.
     routeRules: { '/admin/**': { ssr: false, headers: { 'X-Robots-Tag': 'noindex, nofollow' } } },
     runtimeConfig: {

@@ -1,0 +1,14 @@
+{
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "name": "ternal-portfolio",
+    "main": "./.output/server/index.mjs",
+    "assets": { "binding": "ASSETS", "directory": "./.output/public/" },
+    "compatibility_date": "2025-07-15",
+    "compatibility_flags": ["nodejs_compat"],
+    "observability": { "enabled": true },
+    // Public values (RLS protects the data), read by Nuxt runtimeConfig.public at runtime.
+    "vars": {
+        "NUXT_PUBLIC_SUPABASE_URL": "https://mdvqbvnyakxhmmfeeqij.supabase.co",
+        "NUXT_PUBLIC_SUPABASE_KEY": "sb_publishable_WAiIGaVIK8RejxPHVy8Rlg_P-0KsDK5"
+    }
+}
